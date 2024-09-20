@@ -1,11 +1,30 @@
 import { useState } from "react";
 import HomeLayout from "../Layouts/HomeLayout";
 import { BsPersonCircle } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 function Signup(){
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [previewImage, setPreviewImage] = useState("");
+
+    const [signupData, setSignupData] = useState({
+        fullName: "",
+        email: "",
+        password: "",
+        avatar: ""
+    });
+
+    function handleUserInput(e) {
+        const {name, value} = e.target;
+        setSignupData({
+            ...signupData,
+            [name]: value
+        })
+    }
 
     return (
         <>
@@ -22,7 +41,6 @@ function Signup(){
                             <BsPersonCircle className="w-24 h-24 rounded-full m-auto"/>
                         )}
 
-
                     </label>
                     <input
 
@@ -33,6 +51,24 @@ function Signup(){
                         accept=".jpg, .jpeg, .png, .svg"
 
                     />
+
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="fullName" className="font-semibold"> Name </label>
+                        <input
+                        
+                            type="text"
+                            required
+                            name="fullName"
+                            id="fullName"
+                            placeholder="Enter your name..."
+                            className="bg-transparent px-2 py-1 border"
+                            onChange={handleUserInput}
+                            value={signupData.fullName}
+                        
+                        />
+
+                    </div>
+
                     <div className="flex flex-col gap-1">
                         <label htmlFor="email" className="font-semibold"> Email </label>
                         <input
@@ -43,11 +79,13 @@ function Signup(){
                             id="email"
                             placeholder="Enter your email..."
                             className="bg-transparent px-2 py-1 border"
+                            onChange={handleUserInput}
+                            value={signupData.email}
                         
                         />
 
                     </div>
-
+                    
                     <div className="flex flex-col gap-1">
                         <label htmlFor="password" className="font-semibold"> Password </label>
                         <input
@@ -58,10 +96,13 @@ function Signup(){
                             id="password"
                             placeholder="Enter your password..."
                             className="bg-transparent px-2 py-1 border"
+                            onChange={handleUserInput}
+                            value={signupData.password}
                         
                         />
 
                     </div>
+                    
                     <button type="submit" className="mt-2 bg-yellow-600 hover:bg-yellow-500 transition-all ease-in-out duration-300 rounded-sm py-2 font-semibold text-lg cursor-pointer">
                         Create Account
                     </button>
