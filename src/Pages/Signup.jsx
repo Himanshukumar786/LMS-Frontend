@@ -1,6 +1,7 @@
 import { useState } from "react";
 import HomeLayout from "../Layouts/HomeLayout";
 import { BsPersonCircle } from "react-icons/bs";
+import { Link } from "react-router-dom";
 
 function Signup(){
 
@@ -64,6 +65,9 @@ function Signup(){
                     <button type="submit" className="mt-2 bg-yellow-600 hover:bg-yellow-500 transition-all ease-in-out duration-300 rounded-sm py-2 font-semibold text-lg cursor-pointer">
                         Create Account
                     </button>
+                    <p className="text-center">
+                        Already have an account ? <Link to="/login" className="link text-accent cursor-pointer"> Login </Link>
+                    </p>
                 </form>
             </div>
         </HomeLayout>
