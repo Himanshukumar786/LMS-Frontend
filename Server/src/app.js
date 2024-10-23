@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import dotenv from "dotenv";
 import userRoutes from './routes/userRoutes.js';
+import errorMiddleware from './middlewares/errorMiddleware.js';
 dotenv.config();
 
 const app = express();
@@ -28,5 +29,7 @@ app.use('/api/v1/user', userRoutes);
 app.all('*', (req, res) => {
     res.status(404).send('OOPS! 404 Page Not Found');
 });
+
+app.use(errorMiddleware);
 
 export default app;
