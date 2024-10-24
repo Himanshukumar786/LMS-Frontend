@@ -70,8 +70,8 @@ userSchema.methods = {
             }
         );
     },
-    comparePassword: function(plainTextPassword) {
-        return bcrypt.compareSync(plainTextPassword, this.password);
+    comparePassword: async function(plainTextPassword) {
+        return await bcrypt.compare(plainTextPassword, this.password);
     }
 };
 
