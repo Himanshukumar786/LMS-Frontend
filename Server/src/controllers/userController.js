@@ -51,12 +51,41 @@ const register = async (req, res, next) => {
     });
 }
 
-const login = (req, res) => {
-    res.send('Login route');
+const login = async (req, res) => {
+
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return next(new AppError('All fields are required', 400));
+        }
+
+        const user = await User.findOne({ 
+            email 
+        }).select('+password');
+
+        if (!user || !user.comparePassword(password)) {
+            return next(new AppError('Email or password does not match', 400));
+        };
+
+        const token = await user.generateJWTToken();
+        user.password = undefined;
+
+        res.cookie('token', token, cookieOptions);
+
+        res.status(200).json({
+            success: true,
+            message: 'User logged in successfully',
+            user,
+        });
+
+    } catch (error) {
+        return next(new AppError(error.message, 500));
+    }
 }
 
 const logout = (req, res) => {
-    res.send('Logout route');
+    
 }
 
 const getProfile = (req, res) => {

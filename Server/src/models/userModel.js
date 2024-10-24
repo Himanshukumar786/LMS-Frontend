@@ -69,6 +69,9 @@ userSchema.methods = {
                 expiresIn: process.env.JWT_EXPIRY,
             }
         );
+    },
+    comparePassword: function(plainTextPassword) {
+        return bcrypt.compareSync(plainTextPassword, this.password);
     }
 };
 
