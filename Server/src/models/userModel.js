@@ -66,7 +66,7 @@ userSchema.methods = {
             { id: this._id, role: this.role, subscription: this.subscription },
                 process.env.JWT_SECRET,
             {
-                expiresIn: process.env.JWT_EXPIRY,
+                expiresIn: '7d',
             }
         );
     },
