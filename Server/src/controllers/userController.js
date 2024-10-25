@@ -2,6 +2,7 @@ import User from "../models/userModel.js";
 import AppError from "../utils/errorUtil.js";
 import cloudinary from 'cloudinary';
 import fs from 'fs/promises';
+import sendEmail from "../utils/sendEmail.js";
 
 const cookieOptions = {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
@@ -137,4 +138,54 @@ const getProfile = async (req, res) => {
     }
 }
 
-export { register, login, logout, getProfile };
+const forgotPassword = async (req, res, next) => {
+    console.log('forgotPassword -> ', req.body);
+    const { email } = req.body;
+
+    if (!email) {
+        return next(new AppError('Email is required', 400));
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        return next(new AppError('Email not registered', 400));
+    }
+
+    const resetToken = await user.generateResetPasswordToken();
+
+    await user.save();
+
+    const resetPasswordUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    console.log('resetPasswordUrl -> ', resetPasswordUrl);
+
+    // We here need to send an email to the user with the token
+    const subject = 'Reset Password';
+    const message = `You can reset your password by clicking <a href=${resetPasswordUrl} target="_blank">Reset your password</a>\nIf the above link does not work for some reason then copy paste this link in new tab ${resetPasswordUrl}.\n If you have not requested this, kindly ignore.`;
+
+    try {
+        // Send email with reset password link
+        await sendEmail(email, subject, message);
+
+        res.status(200).json({
+            success: true,
+            message: `Reset password token has been sent to ${email} successfully`,
+        });
+    } catch (error) {
+
+        user.forgetPasswordToken = undefined;
+        user.forgetPasswordExpire = undefined;
+
+        await user.save();
+
+        return next(new AppError(error.message, 500));
+    }
+}
+
+const resetPassword = async (req, res) => {
+    const { resetToken } = req.params;
+
+}
+
+export { register, login, logout, getProfile, forgotPassword, resetPassword };
