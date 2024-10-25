@@ -3,6 +3,7 @@ import AppError from "../utils/errorUtil.js";
 import cloudinary from 'cloudinary';
 import fs from 'fs/promises';
 import sendEmail from "../utils/sendEmail.js";
+import crypto from 'crypto';
 
 const cookieOptions = {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
@@ -186,6 +187,34 @@ const forgotPassword = async (req, res, next) => {
 const resetPassword = async (req, res) => {
     const { resetToken } = req.params;
 
+    const { password } = req.body;
+    
+    const forgetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+    
+    const user = await User.findOne({
+        forgetPasswordToken,
+        forgetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+        return next(new AppError('Token is invalid or has expired, please try again', 400));
+    }
+
+    user.password = password;
+    user.forgetPasswordToken = undefined;
+    user.forgetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Password changed successfully',
+    });
 }
 
-export { register, login, logout, getProfile, forgotPassword, resetPassword };
+
+
+export { register, login, logout, getProfile, forgotPassword, resetPassword, changePassword };
