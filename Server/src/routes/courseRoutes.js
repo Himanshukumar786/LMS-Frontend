@@ -8,13 +8,20 @@ const router = Router();
 router.route('/')
     .get(getAllCourses)
     .post(
+        isLoggedIn,
         upload.single('thumbnail'),
         createCourse
     )
 
 router.route('/:id')
     .get(isLoggedIn, getLecturesByCourseId)
-    .put(updateCourse)
-    .delete(removeCourse);
+    .put(
+        isLoggedIn,
+        updateCourse
+    )
+    .delete(
+        isLoggedIn,
+        removeCourse
+    );
 
 export default router;
